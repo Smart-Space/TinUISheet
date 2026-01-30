@@ -51,9 +51,11 @@ TinUISheet(
 > }
 > ```
 
-**set_head(index:int, head:str)**
+**set_head(index:int, head)**
 
 设置某个表头文本。
+
+> head可以为`str`，也可以同上为`dict`。
 
 **append_content(content)**
 
@@ -65,8 +67,16 @@ TinUISheet(
 
 **set_content(index:int, index2:int, content:str)**
 
-设置`index`行`index2`列的数据
+设置`index`行`index2`列的数据。
 
 **get_selected()**
 
 获取当前选中块的文本，无则返回`None`。
+
+**delete_row(index:int)**
+
+删除某行。
+
+**delete_col(index:int)**
+
+删除某列。
