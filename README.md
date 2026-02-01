@@ -4,7 +4,7 @@
 
 > [!warning]
 >
-> 当前TinUISheet仍处于早期开发状态，虽已经可用于TinUI，但是其实例参数、使用方法、效果等仍可能会有变动。
+> TinUISheet已经可用于TinUI，但是当前仍处于早期开发状态。
 
 ---
 
@@ -38,6 +38,12 @@ TinUISheet(
 >
 > 标准配色随时可能变动，建议自行指定颜色。
 
+> [!tip]
+>
+> 通过`TinUISheet.uid`获取控件标识符，用于TinUI面板布局。
+>
+> TinSheet支持普通面板布局和拓展拉伸布局。当置于`ExpandPanel`中时，表格外框会平铺面板区域，表格本体的原点仍为表格框左上角。
+
 **set_heads(heads)**
 
 设置整个表头文本。
@@ -69,9 +75,11 @@ TinUISheet(
 
 设置`index`行`index2`列的数据。
 
-**get_selected()**
+**get_selected(specific=False)**
 
-获取当前选中块的文本，无则返回`None`。
+获取当前选中行中的所有文本列表，无则返回`None`。
+
+当`specific`为`True`时，返回选中块的文本。
 
 **delete_row(index:int)**
 

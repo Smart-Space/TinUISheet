@@ -31,6 +31,7 @@ class TinUISheet:
 		self.headfont = headfont
 		self.minwidth = minwidth
 		self.maxwidth = maxwidth
+		self.anchor = anchor
 
 		self.box = BasicTinUI(ui, bg=bg)
 		uid = ui.create_window(pos, window = self.box, width=width-8, height=height-8, anchor=anchor)
@@ -44,11 +45,37 @@ class TinUISheet:
 		self.sch = ui.add_scrollbar((bbox[0], bbox[3]), self.box, bbox[2]-bbox[0], "x")[-1]
 		ui.addtag_withtag(self.uid, self.sch)
 
-		back = ui.add_back((), (self.uid,), fg=bg, bg=bg, linew=0)
-		ui.addtag_withtag(self.uid, back)
+		self.back = ui.add_back((), (self.uid,), fg=bg, bg=bg, linew=0)
+		ui.addtag_withtag(self.uid, self.back)
 
 		self.box.bind("<MouseWheel>", self.__scroll)
 		self.__scroll_region()
+
+		self.uid.layout = self.__layout
+	
+	def __layout(self, x1, y1, x2, y2, expand=False):
+		if not expand:
+			dx, dy = self.ui._BasicTinUI__auto_layout(self.uid, (x1, y1, x2, y2), self.anchor)
+			self.scv.move(dx, dy, self.height)
+			self.sch.move(dx, dy, self.width)
+		else:
+			dx, dy = self.ui._BasicTinUI__auto_layout(self.uid, (x1, y1, x2, y2), "nw")
+			width2 = x2 - x1 - 9
+			dw = width2 - self.width
+			self.width = width2
+			height2 = y2 - y1 - 9
+			dh = height2 - self.height
+			self.height = height2
+			self.ui.move(self.scv, dw, 0)
+			self.scv.move(dx + dw, dy, self.height)
+			self.ui.move(self.sch, 0, dh)
+			self.sch.move(dx, dy + dh, self.width)
+			coord = self.ui.coords(self.back)
+			coord[2] = coord[4] = x2 - 4
+			coord[5] = coord[7] = y2 - 4
+			self.ui.coords(self.back, coord)
+			self.ui.itemconfig(self._ui, width=self.width, height=self.height)
+			self.__scroll_region()
 	
 	def __scroll(self, event):
 		if event.delta > 0:
@@ -237,10 +264,16 @@ class TinUISheet:
 		item = self.data[index][index2][0]
 		self.box.itemconfig(item, text=content)
 	
-	def get_selected(self):
-		if self.selected_item:
+	def get_selected(self, specific=False):
+		if specific and self.selected_item:
 			return self.box.itemcget(self.selected_item, 'text')
-		return None
+		elif self.selected != -1:
+			res = []
+			for items in self.data[self.selected]:
+				res.append(self.box.itemcget(items[0], 'text'))
+			return res
+		else:
+			return None
 	
 	def __move_up(self, index:int, height:int):
 		for items in self.data[index:]:
@@ -309,13 +342,15 @@ class TinUISheet:
 
 if __name__ == "__main__":
 	from tkinter import Tk
+	from tinui import ExpandPanel, HorizonPanel
 
 	def test(_):
 		# tus.delete_col(0)
 		# tus.delete_row(0)
-		tus.set_head(0, {'title':'α', 'width':200})
-		tus.set_head(1, 'bbb')
-		# tus.append_content(['三','444','555',' ',' '])
+		# tus.set_head(0, {'title':'α', 'width':200})
+		# tus.set_head(1, 'bbb')
+		# for _ in range(30):
+		# 	tus.append_content(['三','444','555',' ',' '])
 		pass
 
 	root = Tk()
@@ -334,8 +369,20 @@ if __name__ == "__main__":
 	tus.append_content(['三','444','555',' ',' ',' '])
 	tus.set_contents(1, ['Ⅳ','⑤','陆',' ',' ',' '])
 	tus.set_content(2, 2, '玖')
-	# ui.after(2000, lambda: print(tus.get_selected()))
+	# ui.after(2000, lambda: print(tus.get_selected(True)))
 
-	ui.add_button((10,350), text='test', command=test)
+	rp = ExpandPanel(ui)
+	hp = HorizonPanel(ui, spacing=10)
+	rp.set_child(hp)
+
+	ep = ExpandPanel(ui, bg="#f7acff")
+	hp.add_child(ep, weight=1)
+	ep.set_child(tus.uid)
+
+	hp.add_child(ui.add_button((10,350), text='test', command=test)[-1], 100)
+
+	def update(e):
+		rp.update_layout(5,5,e.width-5,e.height-5)
+	ui.bind('<Configure>',update)
 
 	root.mainloop()
