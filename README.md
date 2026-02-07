@@ -6,6 +6,10 @@
 >
 > TinUISheet已经可用于TinUI，但是当前仍处于早期开发状态。
 
+<img src="./screenshots/l.png" width="400" />
+
+<img src="./screenshots/d.png" width="400" />
+
 ---
 
 # 使用
@@ -37,6 +41,8 @@ TinUISheet(
 > [!note]
 >
 > 标准配色随时可能变动，建议自行指定颜色。
+>
+> `tinuisheet`提供`sheetlight`和`sheetdark`两种**样式配色**。
 
 > [!tip]
 >
@@ -88,3 +94,55 @@ TinUISheet(
 **delete_col(index:int)**
 
 删除某列。
+
+---
+
+# 示例
+
+```python
+from tkinter import Tk
+from tinui import BasicTinUI, ExpandPanel, HorizonPanel
+
+def test(_):
+    tus.delete_col(0)
+    tus.delete_row(0)
+    tus.set_head(0, {'title':'α', 'width':200})
+    tus.set_head(1, 'bbb')
+    for _ in range(30):
+        tus.append_content(['三','444','555',' ',' '])
+    pass
+
+root = Tk()
+root.geometry("400x400")
+
+ui = BasicTinUI(root)
+ui.pack(expand=True, fill='both')
+tus = TinUISheet(ui, (15,15), **sheetlight)
+
+tus.set_heads(['a',{'title':'b','width':200},'c',' ',' ',' '])
+tus.append_content(['一','222','333',' ',' ',' '])
+tus.append_content(['四','555','666',' ',' ',' '])
+tus.append_content(['七','888','999',' ',' ',' '])
+tus.append_content(['万','000','111',' ',' ',' '])
+tus.append_content(['三','444','555',' ',' ',' '])
+tus.set_contents(1, ['Ⅳ','⑤','陆',' ',' ',' '])
+tus.set_content(2, 2, '玖')
+ui.after(2000, lambda: print(tus.get_selected(True)))
+
+rp = ExpandPanel(ui)
+hp = HorizonPanel(ui, spacing=10)
+rp.set_child(hp)
+
+ep = ExpandPanel(ui)
+hp.add_child(ep, weight=1)
+ep.set_child(tus.uid)
+
+hp.add_child(ui.add_button((10,350), text='test', command=test)[-1], 100)
+
+def update(e):
+    rp.update_layout(5,5,e.width-5,e.height-5)
+ui.bind('<Configure>',update)
+
+root.mainloop()
+```
+

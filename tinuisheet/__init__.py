@@ -1,6 +1,30 @@
 from tinui import BasicTinUI
 from tinui.TinUI import TinUIString
 
+sheetlight = {
+	'fg': "#191919",
+	'bg': '#f3f3f3',
+	'itemfg': '#1a1a1a',
+	'itembg': '#f9f9f9',
+	'itemactivefg': '#191919',
+	'itemactivebg': '#f0f0f0',
+	'itemonfg': '#191919',
+	'itemonbg': '#e8e8e8',
+	'headbg': '#f0f0f0',
+}
+
+sheetdark = {
+	'fg': "#ffffff",
+	'bg': '#202020',
+	'itemfg': '#ffffff',
+	'itembg': '#272727',
+	'itemactivefg': '#ffffff',
+	'itemactivebg': '#343434',
+	'itemonfg': '#ffffff',
+	'itemonbg': '#404040',
+	'headbg': '#343434',
+}
+
 class TinUISheet:
 	ui:BasicTinUI = None
 	uid:TinUIString = None
@@ -345,12 +369,12 @@ if __name__ == "__main__":
 	from tinui import ExpandPanel, HorizonPanel
 
 	def test(_):
-		# tus.delete_col(0)
-		# tus.delete_row(0)
-		# tus.set_head(0, {'title':'α', 'width':200})
-		# tus.set_head(1, 'bbb')
-		# for _ in range(30):
-		# 	tus.append_content(['三','444','555',' ',' '])
+		tus.delete_col(0)
+		tus.delete_row(0)
+		tus.set_head(0, {'title':'α', 'width':200})
+		tus.set_head(1, 'bbb')
+		for _ in range(30):
+			tus.append_content(['三','444','555',' ',' '])
 		pass
 
 	root = Tk()
@@ -358,7 +382,7 @@ if __name__ == "__main__":
 
 	ui = BasicTinUI(root)
 	ui.pack(expand=True, fill='both')
-	tus = TinUISheet(ui, (15,15))
+	tus = TinUISheet(ui, (15,15), **sheetlight)
 
 	tus.set_heads(['a',{'title':'b','width':200},'c',' ',' ',' '])
 	# tus.set_head(1, 'bbb')
@@ -369,13 +393,14 @@ if __name__ == "__main__":
 	tus.append_content(['三','444','555',' ',' ',' '])
 	tus.set_contents(1, ['Ⅳ','⑤','陆',' ',' ',' '])
 	tus.set_content(2, 2, '玖')
-	# ui.after(2000, lambda: print(tus.get_selected(True)))
+	ui.after(2000, lambda: print(tus.get_selected(True)))
 
 	rp = ExpandPanel(ui)
 	hp = HorizonPanel(ui, spacing=10)
 	rp.set_child(hp)
 
-	ep = ExpandPanel(ui, bg="#f7acff")
+	# ep = ExpandPanel(ui, bg="#f7acff")
+	ep = ExpandPanel(ui)
 	hp.add_child(ep, weight=1)
 	ep.set_child(tus.uid)
 
