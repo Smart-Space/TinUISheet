@@ -50,7 +50,7 @@ TinUISheet(
 >
 > TinSheet支持普通面板布局和拓展拉伸布局。当置于`ExpandPanel`中时，表格外框会平铺面板区域，表格本体的原点仍为表格框左上角。
 
-**set_heads(heads)**
+#### set_heads(heads)
 
 设置整个表头文本。
 
@@ -58,40 +58,50 @@ TinUISheet(
 >
 > ```json
 > {
->     'title': 'TITLE',
->     'width': WIDTH-INT // 宽度
+>  'title': 'TITLE',
+>  'width': WIDTH-INT // 宽度
 > }
 > ```
 
-**set_head(index:int, head)**
+> [!important]
+>
+> 若表格文本超出一行，则整个表头背景均会匹配最长的一个表头内容。此后的修改，除非为空表格，均不会调整表头高度。作为表单数据显示控件，不建议内容中存在换行字符。
+
+#### set_head(index:int, head)
 
 设置某个表头文本。
 
 > head可以为`str`，也可以同上为`dict`。
 
-**append_content(content)**
+#### append_content(content)
 
 加入一行数据。
 
-**set_contents(index:int, contents:list)**
+> [!important]
+>
+> 若表格内容超出一行，则整行背景均会匹配最长的一个内容。单独设置一个或一行表格，均不会改变高度。作为表单数据显示控件，不建议内容中存在换行字符。
+
+#### set_contents(index:int, contents:list)
 
 设置一行数据（从表头栏下一行开始记为`0`）。
 
-**set_content(index:int, index2:int, content:str)**
+#### set_content(index:int, index2:int, content:str)
 
 设置`index`行`index2`列的数据。
 
-**get_selected(specific=False)**
+#### get_selected(specific=False)
 
 获取当前选中行中的所有文本列表，无则返回`None`。
 
 当`specific`为`True`时，返回选中块的文本。
 
-**delete_row(index:int)**
+#### delete_row(index:int)
 
 删除某行。
 
-**delete_col(index:int)**
+> 无法删除表头。
+
+#### delete_col(index:int)
 
 删除某列。
 

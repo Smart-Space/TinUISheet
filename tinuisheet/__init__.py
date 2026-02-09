@@ -149,6 +149,7 @@ class TinUISheet:
 		self.titles.clear()
 
 		x = 0
+		maxheight = 0
 		for head in heads:
 			this_width = self.maxwidth
 			_this_width = this_width
@@ -174,6 +175,11 @@ class TinUISheet:
 			bbox = self.box.bbox(tag)
 			x = bbox[2]+1
 			self.endy = max(self.endy, bbox[3]+4)
+			maxheight = max(maxheight, height)
+		for _, back, _, _, _ in self.titles:
+			coords = self.box.coords(back)
+			coords[5] = coords[7] = maxheight-3
+			self.box.coords(back, coords)
 		
 		self.__scroll_region()
 	
@@ -251,6 +257,7 @@ class TinUISheet:
 		
 		level = self.data.__len__()
 		items = []
+		maxheight = 0
 		for i, text in enumerate(content):
 			width = self.titles[i][2]
 			x = self.titles[i][3]
@@ -266,9 +273,13 @@ class TinUISheet:
 			self.box.tag_bind(tag, '<Leave>', lambda e, t=this_list: self.__line_leave(t))
 			self.box.tag_bind(tag, '<Button-1>', lambda e, t=this_list: self.__line_select(t))
 			items.append(this_list)
-			endy = max(self.endy, bbox[3]+6)
+			maxheight = max(maxheight, bbox[3]-3)
+		for _, back, _, _ in items:
+			coords = self.box.coords(back)
+			coords[5] = coords[7] = maxheight
+			self.box.coords(back, coords)
 		self.data.append(items)
-		self.endy = endy
+		self.endy = maxheight+9
 
 		self.__scroll_region()
 	
@@ -387,7 +398,7 @@ if __name__ == "__main__":
 	tus.set_heads(['a',{'title':'b','width':200},'c',' ',' ',' '])
 	# tus.set_head(1, 'bbb')
 	tus.append_content(['一','222','333',' ',' ',' '])
-	tus.append_content(['四','555','666',' ',' ',' '])
+	tus.append_content(['四','5\n55','666',' ',' ',' '])
 	tus.append_content(['七','888','999',' ',' ',' '])
 	tus.append_content(['万','000','111',' ',' ',' '])
 	tus.append_content(['三','444','555',' ',' ',' '])
