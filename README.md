@@ -81,6 +81,11 @@ TinUISheet(
 >
 > 若表格内容超出一行，则整行背景均会匹配最长的一个内容。单独设置一个或一行表格，均不会改变高度。作为表单数据显示控件，不建议内容中存在换行字符。
 
+> `content`中的每一个元素，如果是字符串，则是常规文本，如果是字典，应当具备基本数据：`{'text':TEXT, 'type':TYPE, ...}`，`TYPE`如下：
+>
+> - `text`，普通文本
+> - `check`，复选框。另外接收`command`回调函数（默认`None`）、`colors`配色（默认TinUI标准配色）、`val`初始值（默认`False`）
+
 #### set_contents(index:int, contents:list)
 
 设置一行数据（从表头栏下一行开始记为`0`）。

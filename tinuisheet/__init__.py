@@ -222,12 +222,12 @@ class TinUISheet:
 		item, back, _, level = this_list
 		if level == self.selected:
 			return
-		self.box.itemconfig(item, fill=self.itemonfg)
+		if isinstance(item, int): self.box.itemconfig(item, fill=self.itemonfg)
 		self.box.itemconfig(back, fill=self.itemonbg, outline=self.itemonbg)
 		for i, b, _, _ in self.data[level]:
 			if b == back:
 				continue
-			self.box.itemconfig(i, fill=self.itemactivefg)
+			if isinstance(i, int): self.box.itemconfig(i, fill=self.itemactivefg)
 			self.box.itemconfig(b, fill=self.itemactivebg, outline=self.itemactivebg)
 	
 	def __line_leave(self, this_list):
@@ -238,7 +238,7 @@ class TinUISheet:
 		if level == self.selected:
 			return
 		for item, back, _, _ in self.data[level]:
-			self.box.itemconfig(item, fill=self.itemfg)
+			if isinstance(item, int): self.box.itemconfig(item, fill=self.itemfg)
 			self.box.itemconfig(back, fill=self.itembg, outline=self.itembg)
 	
 	def __line_select(self, this_list):
@@ -261,9 +261,29 @@ class TinUISheet:
 		for i, text in enumerate(content):
 			width = self.titles[i][2]
 			x = self.titles[i][3]
-			item = self.box.add_paragraph((x,self.endy), text, fg=self.itemfg, width=width, font=self.font)
+
+			if isinstance(text, str):
+				item = self.box.add_paragraph((x,self.endy), text, fg=self.itemfg, width=width, font=self.font)
+			elif isinstance(text, dict):
+				_text = text.get('text', '')
+				_type = text.get('type', 'text')
+				if _type == 'text':
+					item = self.box.add_paragraph((x,self.endy), _text, fg=self.itemfg, width=width, font=self.font)
+				elif _type == 'check':
+					_colors = text.get('colors', {})
+					_command = text.get('command', None)
+					_items = self.box.add_checkbutton((x,self.endy), _text, command=_command, font=self.font, **_colors)
+					_val = text.get('val', False)
+					if _val:
+						_items[-2].on()
+					item = _items[-1]
+				else:
+					raise ValueError("unknown type " + _type)
+			else:
+				raise ValueError("content must be str or a dict with 'text' key")
 			tag = f'tinuisheet-item-{item}'
 			self.box.addtag_withtag(tag, item)
+			
 			bbox = self.box.bbox(item)
 			backbbox = (x, bbox[1]+3, x+width, bbox[1]+3, x+width, bbox[3]-3, x, bbox[3]-3)
 			back = self.box.create_polygon(backbbox, fill=self.itembg, outline=self.itembg, width=9, tags=tag)
@@ -290,14 +310,14 @@ class TinUISheet:
 		items = self.data[index]
 		i = 0
 		for item, _, _, _ in items:
-			self.box.itemconfig(item, text=contents[i])
+			if isinstance(item, int): self.box.itemconfig(item, text=contents[i])
 			i += 1
 		
 		self.__scroll_region()
 	
 	def set_content(self, index:int, index2:int, content:str):
 		item = self.data[index][index2][0]
-		self.box.itemconfig(item, text=content)
+		if isinstance(item, int): self.box.itemconfig(item, text=content)
 	
 	def get_selected(self, specific=False):
 		if specific and self.selected_item:
@@ -397,12 +417,12 @@ if __name__ == "__main__":
 
 	tus.set_heads(['a',{'title':'b','width':200},'c',' ',' ',' '])
 	# tus.set_head(1, 'bbb')
-	tus.append_content(['一','222','333',' ',' ',' '])
-	tus.append_content(['四','5\n55','666',' ',' ',' '])
-	tus.append_content(['七','888','999',' ',' ',' '])
-	tus.append_content(['万','000','111',' ',' ',' '])
-	tus.append_content(['三','444','555',' ',' ',' '])
-	tus.set_contents(1, ['Ⅳ','⑤','陆',' ',' ',' '])
+	tus.append_content(['一',{'text':'222','type':'check'},'333',' ',' ',' '])
+	tus.append_content(['四',{'text':'5\n55','type':'check','val':True},'666',' ',' ',' '])
+	tus.append_content(['七',{'text':'888','type':'check'},'999',' ',' ',' '])
+	tus.append_content(['万',{'text':'000','type':'check'},'111',' ',' ',' '])
+	tus.append_content(['三',{'text':'444','type':'check'},'555',' ',' ',' '])
+	tus.set_contents(1, ['Ⅳ',{'text':'⑤','type':'check'},'陆',' ',' ',' '])# 这里指定checkbutton是没有用的
 	tus.set_content(2, 2, '玖')
 	ui.after(2000, lambda: print(tus.get_selected(True)))
 
