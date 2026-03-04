@@ -85,6 +85,7 @@ TinUISheet(
 >
 > - `text`，普通文本
 > - `check`，复选框。另外接收`command`回调函数（默认`None`）、`colors`配色（默认TinUI标准配色）、`val`初始值（默认`False`）
+> - `button`，圆角按钮。另外接收`command`回调函数、`colors`配色
 
 #### set_contents(index:int, contents:list)
 

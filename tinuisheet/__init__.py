@@ -277,6 +277,10 @@ class TinUISheet:
 					if _val:
 						_items[-2].on()
 					item = _items[-1]
+				elif _type == 'button':
+					_colors = text.get('colors', {})
+					_command = text.get('command', None)
+					item = self.box.add_button2((x,self.endy), _text, minwidth=width-11, maxwidth=width-11, command=_command, font=self.font, **_colors)[-1]
 				else:
 					raise ValueError("unknown type " + _type)
 			else:
@@ -417,7 +421,7 @@ if __name__ == "__main__":
 
 	tus.set_heads(['a',{'title':'b','width':200},'c',' ',' ',' '])
 	# tus.set_head(1, 'bbb')
-	tus.append_content(['一',{'text':'222','type':'check'},'333',' ',' ',' '])
+	tus.append_content(['一',{'text':'222','type':'check'},{'text':'333', 'type':'button'},' ',' ',' '])
 	tus.append_content(['四',{'text':'5\n55','type':'check','val':True},'666',' ',' ',' '])
 	tus.append_content(['七',{'text':'888','type':'check'},'999',' ',' ',' '])
 	tus.append_content(['万',{'text':'000','type':'check'},'111',' ',' ',' '])
