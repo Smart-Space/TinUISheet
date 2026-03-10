@@ -251,6 +251,22 @@ class TinUISheet:
 		self.selected = level
 		self.selected_item = item
 	
+	def __edit_entry_confirm(self, entry, val, tag_name, command):
+		text = entry[0].get()
+		self.box.itemconfig(val, text=text)
+		self.box.dtag(entry[-1], tag_name)
+		entry[0].destroy()
+		self.box.delete(entry[-1])
+		if command:
+			command(text)
+	def __edit_entry(self, val, colors, width, tag_name, command=None):
+		bbox = self.box.bbox(val)
+		text = self.box.itemcget(val, 'text')
+		entry = self.box.add_entry((bbox[0]-6, (bbox[1]+bbox[3])//2), text=text, width=width, font=self.font, anchor='w', **colors)
+		self.box.addtag_withtag(tag_name, entry[-1])
+		entry[0].bind('<Return>', lambda e: self.__edit_entry_confirm(entry, val, tag_name, command))
+		entry[0].bind('<FocusOut>', lambda e: self.__edit_entry_confirm(entry, val, tag_name, command))
+	
 	def append_content(self, content):
 		if content.__len__() != self.titles.__len__():
 			raise ValueError("content count must be equal to heads count")
@@ -261,6 +277,7 @@ class TinUISheet:
 		for i, text in enumerate(content):
 			width = self.titles[i][2]
 			x = self.titles[i][3]
+			edit_flag = False
 
 			if isinstance(text, str):
 				item = self.box.add_paragraph((x,self.endy), text, fg=self.itemfg, width=width, font=self.font)
@@ -281,6 +298,15 @@ class TinUISheet:
 					_colors = text.get('colors', {})
 					_command = text.get('command', None)
 					item = self.box.add_button2((x,self.endy), _text, minwidth=width-11, maxwidth=width-11, command=_command, font=self.font, **_colors)[-1]
+				elif _type == 'edit':
+					_colors = text.get('colors', {})
+					_command = text.get('command', None)
+					_item = self.box.add_paragraph((x,self.endy), _text, fg=self.itemfg, width=width, font=self.font)
+					tag_name = f'tinuisheet-edit-{_item}'
+					self.box.addtag_withtag(tag_name, _item)
+					self.box.tag_bind(_item, '<Double-Button-1>', lambda e, i=_item, c=_colors, w=width-20, t=tag_name, co=_command: self.__edit_entry(i, c, w, t, co))
+					item = tag_name
+					edit_flag = True
 				else:
 					raise ValueError("unknown type " + _type)
 			else:
@@ -291,6 +317,8 @@ class TinUISheet:
 			bbox = self.box.bbox(item)
 			backbbox = (x, bbox[1]+3, x+width, bbox[1]+3, x+width, bbox[3]-3, x, bbox[3]-3)
 			back = self.box.create_polygon(backbbox, fill=self.itembg, outline=self.itembg, width=9, tags=tag)
+			if edit_flag:
+				self.box.tag_bind(tag, '<Double-Button-1>', lambda e, i=_item, c=text.get('colors', {}), w=width-20, t=tag, co=_command: self.__edit_entry(i, c, w, t, co))
 			self.box.tag_raise(item)
 			this_list = [item, back, tag, level]
 			self.box.tag_bind(tag, '<Enter>', lambda e, t=this_list: self.__line_enter(t))
@@ -423,7 +451,7 @@ if __name__ == "__main__":
 	# tus.set_head(1, 'bbb')
 	tus.append_content(['一',{'text':'222','type':'check'},{'text':'333', 'type':'button'},' ',' ',' '])
 	tus.append_content(['四',{'text':'5\n55','type':'check','val':True},'666',' ',' ',' '])
-	tus.append_content(['七',{'text':'888','type':'check'},'999',' ',' ',' '])
+	tus.append_content([{'text':'七','type':'edit','command':print},{'text':'888','type':'check'},'999',' ',' ',' '])
 	tus.append_content(['万',{'text':'000','type':'check'},'111',' ',' ',' '])
 	tus.append_content(['三',{'text':'444','type':'check'},'555',' ',' ',' '])
 	tus.set_contents(1, ['Ⅳ',{'text':'⑤','type':'check'},'陆',' ',' ',' '])# 这里指定checkbutton是没有用的

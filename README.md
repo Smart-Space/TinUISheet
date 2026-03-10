@@ -86,6 +86,7 @@ TinUISheet(
 > - `text`，普通文本
 > - `check`，复选框。另外接收`command`回调函数（默认`None`）、`colors`配色（默认TinUI标准配色）、`val`初始值（默认`False`）
 > - `button`，圆角按钮。另外接收`command`回调函数、`colors`配色
+> - `edit`，可编辑内容。另外接收`command`回调函数（接收修改后文本）、`colors`配色
 
 #### set_contents(index:int, contents:list)
 
@@ -136,12 +137,12 @@ ui.pack(expand=True, fill='both')
 tus = TinUISheet(ui, (15,15), **sheetlight)
 
 tus.set_heads(['a',{'title':'b','width':200},'c',' ',' ',' '])
-tus.append_content(['一','222','333',' ',' ',' '])
-tus.append_content(['四','555','666',' ',' ',' '])
-tus.append_content(['七','888','999',' ',' ',' '])
-tus.append_content(['万','000','111',' ',' ',' '])
-tus.append_content(['三','444','555',' ',' ',' '])
-tus.set_contents(1, ['Ⅳ','⑤','陆',' ',' ',' '])
+	tus.append_content(['一',{'text':'222','type':'check'},{'text':'333', 'type':'button'},' ',' ',' '])
+	tus.append_content(['四',{'text':'5\n55','type':'check','val':True},'666',' ',' ',' '])
+	tus.append_content([{'text':'七','type':'edit','command':print},{'text':'888','type':'check'},'999',' ',' ',' '])
+	tus.append_content(['万',{'text':'000','type':'check'},'111',' ',' ',' '])
+	tus.append_content(['三',{'text':'444','type':'check'},'555',' ',' ',' '])
+	tus.set_contents(1, ['Ⅳ',{'text':'⑤','type':'check'},'陆',' ',' ',' '])
 tus.set_content(2, 2, '玖')
 ui.after(2000, lambda: print(tus.get_selected(True)))
 
@@ -162,3 +163,4 @@ ui.bind('<Configure>',update)
 root.mainloop()
 ```
 
+<img src="./screenshots/demo.png" width="400" />
