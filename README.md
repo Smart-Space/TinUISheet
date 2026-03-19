@@ -2,10 +2,6 @@
 
 [TinUI](https://github.com/Smart-Space/TinUI)的高级表格控件。
 
-> [!warning]
->
-> TinUISheet已经可用于TinUI，但是当前仍处于早期开发状态。
-
 <img src="./screenshots/l.png" width="400" />
 
 <img src="./screenshots/d.png" width="400" />
@@ -164,3 +160,5 @@ root.mainloop()
 ```
 
 <img src="./screenshots/demo.png" width="400" />
+
+> 若要使用更高级的tkinter表格功能，可以使用`tksheet`库。从`add_ui`获取画布控件，再将`Sheet`控件`pack(fill='both',expand=True)`即可，这样可以由TinUI负责`Sheet`的布局。
