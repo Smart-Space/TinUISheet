@@ -98,6 +98,14 @@ TinUISheet(
 
 当`specific`为`True`时，返回选中块的文本。
 
+#### get_selected_item()
+
+获取当前选中的画布元素。
+
+#### get_nearby_item(pos:tuple)
+
+获取离`pos`最近的画布元素列表。为了方便使用，这里的`pos`应当是**控件坐标**，TinUISheet会自动将其转换为画布坐标。
+
 #### delete_row(index:int)
 
 删除某行。
@@ -107,6 +115,14 @@ TinUISheet(
 #### delete_col(index:int)
 
 删除某列。
+
+#### bind(sequence:str, func, add:bool=False)
+
+TinUISheet的事件绑定方法，同tkinter一般控件。返回`funcid`。
+
+#### unbind(sequence:str, funcid:int=None)
+
+事件解绑。
 
 ---
 

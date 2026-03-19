@@ -362,6 +362,21 @@ class TinUISheet:
 		else:
 			return None
 	
+	def get_selected_item(self):
+		return self.selected_item
+
+	def get_nearby_item(self, pos:tuple):
+		x, y = pos
+		relx, rely = self.box.canvasx(x), self.box.canvasy(y)
+		tags = self.box.find_closest(relx, rely)
+		return tags
+	
+	def bind(self, sequence:str, func, add:bool=False):
+		return self.box.bind(sequence, func, add)
+
+	def unbind(self, sequence:str, funcid:int=None):
+		self.box.unbind(sequence, funcid)
+	
 	def __move_up(self, index:int, height:int):
 		for items in self.data[index:]:
 			for item in items:
@@ -456,6 +471,7 @@ if __name__ == "__main__":
 	tus.append_content(['三',{'text':'444','type':'check'},'555',' ',' ',' '])
 	tus.set_contents(1, ['Ⅳ',{'text':'⑤','type':'check'},'陆',' ',' ',' '])# 这里指定checkbutton是没有用的
 	tus.set_content(2, 2, '玖')
+	tus.bind("<Button-3>", lambda e: print(tus.get_nearby_item((e.x, e.y))))
 	ui.after(2000, lambda: print(tus.get_selected(True)))
 
 	rp = ExpandPanel(ui)
