@@ -11,6 +11,7 @@ sheetlight = {
 	'itemonfg': '#191919',
 	'itemonbg': '#e8e8e8',
 	'headbg': '#f0f0f0',
+	'scrollcolor': '#8a8a8a',
 }
 
 sheetdark = {
@@ -23,19 +24,14 @@ sheetdark = {
 	'itemonfg': '#ffffff',
 	'itemonbg': '#404040',
 	'headbg': '#343434',
+	'scrollcolor': '#9f9f9f',
 }
 
 class TinUISheet:
 	ui:BasicTinUI = None
-	uid:TinUIString = None
-	titles = [] # [[item, back, width, x, tag],...]
-	data = [] # [[[item, back, tag, level],...],...]
-	endy = 0
-	selected = -1
-	selected_item = None
 
 	def __init__(self, ui:BasicTinUI, pos:tuple, width=300, height=300, minwidth=100, maxwidth=300, font=('微软雅黑', 12),
-			     fg='black', bg='white', itemfg='#1a1a1a', itembg='#f9f9f9', headbg='#f0f0f0',
+			     fg='black', bg='white', itemfg='#1a1a1a', itembg='#f9f9f9', headbg='#f0f0f0', scrollcolor='#8a8a8a',
 				 itemactivefg='#191919', itemactivebg='#f0f0f0', itemonfg='#191919', itemonbg='#e0e0e0',
 				 headfont=('微软雅黑', 14),
 				 anchor='nw'):
@@ -57,6 +53,13 @@ class TinUISheet:
 		self.maxwidth = maxwidth
 		self.anchor = anchor
 
+		self.uid:TinUIString = None
+		self.titles = [] # [[item, back, width, x, tag],...]
+		self.data = [] # [[[item, back, tag, level],...],...]
+		self.endy = 0
+		self.selected = -1
+		self.selected_item = None
+
 		self.box = BasicTinUI(ui, bg=bg)
 		uid = ui.create_window(pos, window = self.box, width=width-8, height=height-8, anchor=anchor)
 		self._ui = uid
@@ -64,15 +67,14 @@ class TinUISheet:
 		ui.addtag_withtag(self.uid, uid)
 
 		bbox = ui.bbox(uid)
-		self.scv = ui.add_scrollbar((bbox[2], bbox[1]), self.box, bbox[3]-bbox[1], "y")[-1]
+		self.scv = ui.add_scrollbar((bbox[2], bbox[1]), self.box, bbox[3]-bbox[1], "y", bg=bg, color=scrollcolor, oncolor=scrollcolor)[-1]
 		ui.addtag_withtag(self.uid, self.scv)
-		self.sch = ui.add_scrollbar((bbox[0], bbox[3]), self.box, bbox[2]-bbox[0], "x")[-1]
+		self.sch = ui.add_scrollbar((bbox[0], bbox[3]), self.box, bbox[2]-bbox[0], "x", bg=bg, color=scrollcolor, oncolor=scrollcolor)[-1]
 		ui.addtag_withtag(self.uid, self.sch)
 
 		self.back = ui.add_back((), (self.uid,), fg=bg, bg=bg, linew=0)
 		ui.addtag_withtag(self.uid, self.back)
 
-		self.box.bind("<MouseWheel>", self.__scroll)
 		self.__scroll_region()
 
 		self.uid.layout = self.__layout
@@ -100,18 +102,6 @@ class TinUISheet:
 			self.ui.coords(self.back, coord)
 			self.ui.itemconfig(self._ui, width=self.width, height=self.height)
 			self.__scroll_region()
-	
-	def __scroll(self, event):
-		if event.delta > 0:
-			if event.state & 1:
-				self.box.xview_scroll(-1, 'units')
-			else:
-				self.box.yview_scroll(-1, 'units')
-		else:
-			if event.state & 1:
-				self.box.xview_scroll(1, 'units')
-			else:
-				self.box.yview_scroll(1, 'units')
 
 	def __scroll_region(self):
 		bbox = self.box.bbox('all')
@@ -480,7 +470,7 @@ if __name__ == "__main__":
 
 	ui = BasicTinUI(root)
 	ui.pack(expand=True, fill='both')
-	tus = TinUISheet(ui, (15,15), **sheetlight)
+	tus = TinUISheet(ui, (15,15))
 
 	tus.set_heads(['a',{'title':'b','width':200},'c',' ',' ',' '])
 	# tus.set_head(1, 'bbb')

@@ -19,6 +19,7 @@ TinUISheet(
     fg='black', bg='white', itemfg='#1a1a1a', itembg='#f9f9f9', headbg='#f0f0f0',
     itemactivefg='#191919', itemactivebg='#f0f0f0',
     itemonfg='#191919', itemonbg='#e0e0e0',
+    scrollcolor='#8a8a8a',
     headfont=('微软雅黑', 14),
     anchor='nw'
 )
@@ -33,6 +34,7 @@ TinUISheet(
 - itemactivebg-响应鼠标整行背景色
 - itemonfg-选中时文本颜色
 - itemonbg-选中时背景颜色
+- scrollcolor-滚动条颜色
 
 > [!note]
 >
