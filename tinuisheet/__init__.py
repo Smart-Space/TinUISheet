@@ -440,7 +440,27 @@ class TinUISheet:
 			self.box.delete(tag)
 			self.box.dtag(tag)
 			col_items.pop(index)
+	
+	def delete_all(self):
+		while self.data:
+			self.delete_row(0)
+	
+	def get_selected_row(self):
+		if self.selected != -1:
+			return self.selected
+		else:
+			return None
 
+	def get_selected_col(self):
+		if self.selected != -1:
+			index = 0
+			for item, _, _, _ in self.data[self.selected]:
+				if item == self.selected_item:
+					return index
+				index += 1
+			return None
+		else:
+			return None
 
 if __name__ == "__main__":
 	from tkinter import Tk
@@ -472,7 +492,8 @@ if __name__ == "__main__":
 	tus.set_contents(1, ['Ⅳ',{'text':'⑤','type':'check'},'陆',' ',' ',' '])# 这里指定checkbutton是没有用的
 	tus.set_content(2, 2, '玖')
 	tus.bind("<Button-3>", lambda e: print(tus.get_nearby_item((e.x, e.y))))
-	ui.after(2000, lambda: print(tus.get_selected(True)))
+	ui.after(2000, lambda: print(tus.get_selected(True), tus.get_selected_row(), tus.get_selected_col()))
+	ui.after(5000, lambda: tus.delete_all())
 
 	rp = ExpandPanel(ui)
 	hp = HorizonPanel(ui, spacing=10)

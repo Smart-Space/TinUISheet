@@ -102,6 +102,14 @@ TinUISheet(
 
 获取当前选中的画布元素。
 
+#### get_selected_row()
+
+获取选择行的位置。
+
+#### get_selected_col()
+
+获取选择列的位置。
+
 #### get_nearby_item(pos:tuple)
 
 获取离`pos`最近的画布元素列表。为了方便使用，这里的`pos`应当是**控件坐标**，TinUISheet会自动将其转换为画布坐标。
@@ -115,6 +123,10 @@ TinUISheet(
 #### delete_col(index:int)
 
 删除某列。
+
+#### delete_all()
+
+删除所有行。
 
 #### bind(sequence:str, func, add:bool=False)
 
