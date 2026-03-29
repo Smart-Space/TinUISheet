@@ -52,6 +52,7 @@ class TinUISheet:
 		self.minwidth = minwidth
 		self.maxwidth = maxwidth
 		self.anchor = anchor
+		self.scale_value = ui.scale_value
 
 		self.uid:TinUIString = None
 		self.titles = [] # [[item, back, width, x, tag],...]
@@ -61,6 +62,7 @@ class TinUISheet:
 		self.selected_item = None
 
 		self.box = BasicTinUI(ui, bg=bg)
+		self.box.set_scale(self.ui.TINUISCALE)
 		uid = ui.create_window(pos, window = self.box, width=width-8, height=height-8, anchor=anchor)
 		self._ui = uid
 		self.uid = TinUIString(f"tinuisheet-{uid}")
@@ -86,10 +88,10 @@ class TinUISheet:
 			self.sch.move(dx, dy, self.width)
 		else:
 			dx, dy = self.ui._BasicTinUI__auto_layout(self.uid, (x1, y1, x2, y2), "nw")
-			width2 = x2 - x1 - 9
+			width2 = x2 - x1 - self.ui.TINUI_RADIUS_SMALL
 			dw = width2 - self.width
 			self.width = width2
-			height2 = y2 - y1 - 9
+			height2 = y2 - y1 - self.ui.TINUI_RADIUS_SMALL
 			dh = height2 - self.height
 			self.height = height2
 			self.ui.move(self.scv, dw, 0)
@@ -97,8 +99,8 @@ class TinUISheet:
 			self.ui.move(self.sch, 0, dh)
 			self.sch.move(dx, dy + dh, self.width)
 			coord = self.ui.coords(self.back)
-			coord[2] = coord[4] = x2 - 4
-			coord[5] = coord[7] = y2 - 4
+			coord[2] = coord[4] = x2 - self.scale_value(4)
+			coord[5] = coord[7] = y2 - self.scale_value(4)
 			self.ui.coords(self.back, coord)
 			self.ui.itemconfig(self._ui, width=self.width, height=self.height)
 			self.__scroll_region()
@@ -112,11 +114,11 @@ class TinUISheet:
 		if bbox[2]-bbox[0] < self.width:
 			self.ui.itemconfig(self._ui, height = self.height)
 		else:
-			self.ui.itemconfig(self._ui, height = self.height-8)
+			self.ui.itemconfig(self._ui, height = self.height-self.scale_value(8))
 		if bbox[3]-bbox[1] < self.height:
 			self.ui.itemconfig(self._ui, width = self.width)
 		else:
-			self.ui.itemconfig(self._ui,width = self.width-8)
+			self.ui.itemconfig(self._ui,width = self.width-self.scale_value(8))
 	
 	def __move_nw(self, tag, pos):
 		bbox = self.box.bbox(tag)
@@ -157,18 +159,18 @@ class TinUISheet:
 			bbox = self.box.bbox(item)
 			width = min(this_width, max(bbox[2]-bbox[0], _this_width))
 			height = bbox[3]-bbox[1]
-			backbbox = (x, 3, x+width, 3, x+width, height-3, x, height-3)
-			back = self.box.create_polygon(backbbox, fill=self.headbg, outline=self.headbg, width=9, tags=tag)
-			self.box.tag_raise(item)			
+			backbbox = (x, self.scale_value(3), x+width, self.scale_value(3), x+width, height-self.scale_value(3), x, height-self.scale_value(3))
+			back = self.box.create_polygon(backbbox, fill=self.headbg, outline=self.headbg, width=self.ui.TINUI_RADIUS_SMALL, tags=tag)
+			self.box.tag_raise(item)
 			dx, _ = self.__move_nw(tag, (x,0))
 			self.titles.append([item, back, width, x+dx, tag])
 			bbox = self.box.bbox(tag)
-			x = bbox[2]+1
-			self.endy = max(self.endy, bbox[3]+4)
+			x = bbox[2]+self.scale_value(1)
+			self.endy = max(self.endy, bbox[3]+self.scale_value(4))
 			maxheight = max(maxheight, height)
 		for _, back, _, _, _ in self.titles:
 			coords = self.box.coords(back)
-			coords[5] = coords[7] = maxheight-3
+			coords[5] = coords[7] = maxheight-self.scale_value(3)
 			self.box.coords(back, coords)
 		
 		self.__scroll_region()
@@ -252,7 +254,7 @@ class TinUISheet:
 	def __edit_entry(self, val, colors, width, tag_name, command=None):
 		bbox = self.box.bbox(val)
 		text = self.box.itemcget(val, 'text')
-		entry = self.box.add_entry((bbox[0]-6, (bbox[1]+bbox[3])//2), text=text, width=width, font=self.font, anchor='w', **colors)
+		entry = self.box.add_entry((bbox[0]-self.scale_value(6), (bbox[1]+bbox[3])//2), text=text, width=width, font=self.font, anchor='w', **colors)
 		self.box.addtag_withtag(tag_name, entry[-1])
 		entry[0].bind('<Return>', lambda e: self.__edit_entry_confirm(entry, val, tag_name, command))
 		entry[0].bind('<FocusOut>', lambda e: self.__edit_entry_confirm(entry, val, tag_name, command))
@@ -287,14 +289,14 @@ class TinUISheet:
 				elif _type == 'button':
 					_colors = text.get('colors', {})
 					_command = text.get('command', None)
-					item = self.box.add_button2((x,self.endy), _text, minwidth=width-11, maxwidth=width-11, command=_command, font=self.font, **_colors)[-1]
+					item = self.box.add_button2((x,self.endy), _text, minwidth=width-self.scale_value(11), maxwidth=width-self.scale_value(11), command=_command, font=self.font, **_colors)[-1]
 				elif _type == 'edit':
 					_colors = text.get('colors', {})
 					_command = text.get('command', None)
 					_item = self.box.add_paragraph((x,self.endy), _text, fg=self.itemfg, width=width, font=self.font)
 					tag_name = f'tinuisheet-edit-{_item}'
 					self.box.addtag_withtag(tag_name, _item)
-					self.box.tag_bind(_item, '<Double-Button-1>', lambda e, i=_item, c=_colors, w=width-20, t=tag_name, co=_command: self.__edit_entry(i, c, w, t, co))
+					self.box.tag_bind(_item, '<Double-Button-1>', lambda e, i=_item, c=_colors, w=width-self.scale_value(20), t=tag_name, co=_command: self.__edit_entry(i, c, w, t, co))
 					item = tag_name
 					edit_flag = True
 				else:
@@ -305,23 +307,23 @@ class TinUISheet:
 			self.box.addtag_withtag(tag, item)
 			
 			bbox = self.box.bbox(item)
-			backbbox = (x, bbox[1]+3, x+width, bbox[1]+3, x+width, bbox[3]-3, x, bbox[3]-3)
-			back = self.box.create_polygon(backbbox, fill=self.itembg, outline=self.itembg, width=9, tags=tag)
+			backbbox = (x, bbox[1]+self.scale_value(3), x+width, bbox[1]+self.scale_value(3), x+width, bbox[3]-self.scale_value(3), x, bbox[3]-self.scale_value(3))
+			back = self.box.create_polygon(backbbox, fill=self.itembg, outline=self.itembg, width=self.ui.TINUI_RADIUS_SMALL, tags=tag)
 			if edit_flag:
-				self.box.tag_bind(tag, '<Double-Button-1>', lambda e, i=_item, c=text.get('colors', {}), w=width-20, t=tag, co=_command: self.__edit_entry(i, c, w, t, co))
+				self.box.tag_bind(tag, '<Double-Button-1>', lambda e, i=_item, c=text.get('colors', {}), w=width-self.scale_value(20), t=tag, co=_command: self.__edit_entry(i, c, w, t, co))
 			self.box.tag_raise(item)
 			this_list = [item, back, tag, level]
 			self.box.tag_bind(tag, '<Enter>', lambda e, t=this_list: self.__line_enter(t))
 			self.box.tag_bind(tag, '<Leave>', lambda e, t=this_list: self.__line_leave(t))
 			self.box.tag_bind(tag, '<Button-1>', lambda e, t=this_list: self.__line_select(t))
 			items.append(this_list)
-			maxheight = max(maxheight, bbox[3]-3)
+			maxheight = max(maxheight, bbox[3]-self.scale_value(3))
 		for _, back, _, _ in items:
 			coords = self.box.coords(back)
 			coords[5] = coords[7] = maxheight
 			self.box.coords(back, coords)
 		self.data.append(items)
-		self.endy = maxheight+9
+		self.endy = maxheight+self.ui.TINUI_RADIUS_SMALL
 
 		self.__scroll_region()
 	
@@ -453,13 +455,17 @@ class TinUISheet:
 			return None
 
 if __name__ == "__main__":
+	import ctypes
+	ctypes.windll.shcore.SetProcessDpiAwareness(2)
+	scale_factor = ctypes.windll.shcore.GetScaleFactorForDevice(0)/100
+	# scale_factor = 1
 	from tkinter import Tk
 	from tinui import ExpandPanel, HorizonPanel
 
 	def test(_):
 		tus.delete_col(0)
 		tus.delete_row(0)
-		tus.set_head(0, {'title':'α', 'width':200})
+		tus.set_head(0, {'title':'α', 'width':200*scale_factor})
 		tus.set_head(1, 'bbb')
 		for _ in range(30):
 			tus.append_content(['三','444','555',' ',' '])
@@ -469,10 +475,11 @@ if __name__ == "__main__":
 	root.geometry("400x400")
 
 	ui = BasicTinUI(root)
+	ui.set_scale(scale_factor)
 	ui.pack(expand=True, fill='both')
 	tus = TinUISheet(ui, (15,15))
 
-	tus.set_heads(['a',{'title':'b','width':200},'c',' ',' ',' '])
+	tus.set_heads(['a',{'title':'b','width':200*scale_factor},'c',' ',' ',' '])
 	# tus.set_head(1, 'bbb')
 	tus.append_content(['一',{'text':'222','type':'check'},{'text':'333', 'type':'button'},' ',' ',' '])
 	tus.append_content(['四',{'text':'5\n55','type':'check','val':True},'666',' ',' ',' '])
@@ -483,7 +490,7 @@ if __name__ == "__main__":
 	tus.set_content(2, 2, '玖')
 	tus.bind("<Button-3>", lambda e: print(tus.get_nearby_item((e.x, e.y))))
 	ui.after(2000, lambda: print(tus.get_selected(True), tus.get_selected_row(), tus.get_selected_col()))
-	ui.after(5000, lambda: tus.delete_all())
+	# ui.after(5000, lambda: tus.delete_all())
 
 	rp = ExpandPanel(ui)
 	hp = HorizonPanel(ui, spacing=10)
@@ -494,7 +501,7 @@ if __name__ == "__main__":
 	hp.add_child(ep, weight=1)
 	ep.set_child(tus.uid)
 
-	hp.add_child(ui.add_button((10,350), text='test', command=test)[-1], 100)
+	hp.add_child(ui.add_button((0,0), text='test', command=test)[-1], 100)
 
 	def update(e):
 		rp.update_layout(5,5,e.width-5,e.height-5)
