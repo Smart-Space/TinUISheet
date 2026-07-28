@@ -63,7 +63,7 @@ class TinUISheet:
 
 		self.box = BasicTinUI(ui, bg=bg)
 		self.box.set_scale(self.ui.TINUISCALE)
-		uid = ui.create_window(pos, window = self.box, width=width-8, height=height-8, anchor=anchor)
+		uid = ui.create_window(pos, window = self.box, width=width-self.scale_value(8), height=height-self.scale_value(8), anchor=anchor)
 		self._ui = uid
 		self.uid = TinUIString(f"tinuisheet-{uid}")
 		ui.addtag_withtag(self.uid, uid)
